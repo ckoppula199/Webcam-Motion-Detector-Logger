@@ -25,16 +25,24 @@ while True:
     delta_frame=cv2.absdiff(reference_frame, gray)
 
     # makes any pixel with a difference larger than athreshold white, else black
-    thresh_frame=cv2.threshold(delta_frame, 30, 255, cv2.THRESH_BINARY)[1]
-    thresh_frame=cv2.dilate(thresh_frame, None,iterations=2)
+    thresh_frame=cv2.threshold(delta_frame, 60, 255, cv2.THRESH_BINARY)[1]
+    thresh_frame=cv2.dilate(thresh_frame, None,iterations=1)
+
 
     # finds conours of distinct objects in the frame
     (_,cnts,_)=cv2.findContours(thresh_frame.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+    # if object has area greater than 1000 pxls then it is highlighted
+    for contour in cnts:
+        if cv2.contourArea(contour) < 1500:
+            continue
+        (x, y, w, h) = cv2.boundingRect(contour)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2) #draw rectangle
+
     # displays images
     cv2.imshow("Threshold", thresh_frame)
     cv2.imshow("Delta", delta_frame)
-    cv2.imshow("Gray Frame", gray)
+    cv2.imshow("frame", frame)
 
     # if q is pressed then loop is exited
     key = cv2.waitKey(1)
