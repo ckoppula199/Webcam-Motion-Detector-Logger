@@ -4,6 +4,7 @@ face_cascade=cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 video=cv2.VideoCapture(0)
 
 while True:
+    start=time.time()
     check, frame = video.read()
     faces=face_cascade.detectMultiScale(frame,
     scaleFactor=1.05,
@@ -17,6 +18,11 @@ while True:
     key = cv2.waitKey(1)
     if key == ord('q'):
         break
+    end = time.time()
 
+time_taken = end - start
+minutes = time_taken / 60
+frame_rate = fr/minutes/60
+print("Framerate was " + str(frame_rate) + " frames per second")
 video.release()
 cv2.destroyAllWindows()
