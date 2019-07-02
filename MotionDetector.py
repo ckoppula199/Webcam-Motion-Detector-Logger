@@ -1,4 +1,5 @@
-import cv2, time, pandas
+import cv2, time, pandas, imutils
+from imutils.video import VideoStream
 from datetime import datetime
 
 # This is used to store the first image seen by the camaera and
@@ -9,14 +10,18 @@ times = []
 df=pandas.DataFrame(columns=["Start", "End"])
 
 # # starts the camera, argument should  be changed if multiple cameras are available
-video=cv2.VideoCapture(0)
+video = VideoStream(src=0).start()
+time.sleep(2.0)
 
 while True:
 
+
     # captures boolean and numpy array from camera
-    check, frame = video.read()
+    frame = video.read()
+
     status = 0
     # converts image to a gray version for more accuracy later on
+    frame = imutils.resize(frame, width=500)
     gray=cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray=cv2.GaussianBlur(gray, (21, 21,), 0) # smooths edges and reduces noise in calculations
 
@@ -30,8 +35,8 @@ while True:
     delta_frame=cv2.absdiff(reference_frame, gray)
 
     # makes any pixel with a difference larger than athreshold white, else black
-    thresh_frame=cv2.threshold(delta_frame, 30, 255, cv2.THRESH_BINARY)[1] #adjust second argument to change the difference required for a pixel to be classed as moving
-    thresh_frame=cv2.dilate(thresh_frame, None,iterations=1)
+    thresh_frame=cv2.threshold(delta_frame, 25, 255, cv2.THRESH_BINARY)[1] #adjust second argument to change the difference required for a pixel to be classed as moving
+    thresh_frame=cv2.dilate(thresh_frame, None,iterations=2)
 
 
     # finds conours of distinct objects in the frame
@@ -39,7 +44,7 @@ while True:
 
     # if object has area greater than 1500 pxls then it is highlighted
     for contour in cnts:
-        if cv2.contourArea(contour) < 1500: # change value based on size of object trying to detect
+        if cv2.contourArea(contour) < 500: # change value based on size of object trying to detect
             continue
         status = 1
 
@@ -74,5 +79,5 @@ for i in range(0, len(times), 2):
 
 df.to_csv("Times.csv")
 
-video.release()
+video.stop()
 cv2.destroyAllWindows()
