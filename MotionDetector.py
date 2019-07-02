@@ -18,6 +18,7 @@ while True:
 
     # captures boolean and numpy array from camera
     frame = video.read()
+    text = "No Movement Detected"
 
     status = 0
     # converts image to a gray version for more accuracy later on
@@ -50,6 +51,7 @@ while True:
 
         (x, y, w, h) = cv2.boundingRect(contour)
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2) #draw rectangle
+        text = "Motion Detected"
 
     status_list.append(status)
 
@@ -58,6 +60,9 @@ while True:
     if status_list[-1] == 0 and status_list[-2] == 1:
         times.append(datetime.now())
 
+    # adds text overlay of current status and time
+    cv2.putText(frame, "Status: {}".format(text), (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    cv2.putText(frame, datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"), (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0 , 255), 1)
 
     # displays images
     cv2.imshow("Gray", gray)
