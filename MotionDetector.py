@@ -12,7 +12,7 @@ df=pandas.DataFrame(columns=["Start", "End"])
 # # starts the camera, argument should  be changed if multiple cameras are available
 #video=cv2.VideoCapture(0)
 video = VideoStream(src=0).start()
-time.sleep(2.0)
+time.sleep(2.0) #gives camera time to adjust to envronmental conditions
 
 while True:
 
