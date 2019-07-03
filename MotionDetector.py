@@ -10,14 +10,16 @@ times = []
 df=pandas.DataFrame(columns=["Start", "End"])
 
 # # starts the camera, argument should  be changed if multiple cameras are available
-video = VideoStream(src=0).start()
+video=cv2.VideoCapture(0)
+#video = VideoStream(src=0).start()
 time.sleep(2.0)
 
 while True:
 
 
     # captures boolean and numpy array from camera
-    frame = video.read()
+    check, frame = video.read()
+    #frame = video.read()
     text = "No Movement Detected"
 
     status = 0
@@ -84,5 +86,6 @@ for i in range(0, len(times), 2):
 
 df.to_csv("Times.csv")
 
-video.stop()
+video.release()
+#video.stop()
 cv2.destroyAllWindows()
