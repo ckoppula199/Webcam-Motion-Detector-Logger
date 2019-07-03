@@ -10,16 +10,16 @@ times = []
 df=pandas.DataFrame(columns=["Start", "End"])
 
 # # starts the camera, argument should  be changed if multiple cameras are available
-video=cv2.VideoCapture(0)
-#video = VideoStream(src=0).start()
+#video=cv2.VideoCapture(0)
+video = VideoStream(src=0).start()
 time.sleep(2.0)
 
 while True:
 
 
     # captures boolean and numpy array from camera
-    check, frame = video.read()
-    #frame = video.read()
+    #check, frame = video.read()
+    frame = video.read()
     text = "No Movement Detected"
 
     status = 0
@@ -56,11 +56,13 @@ while True:
         text = "Motion Detected"
 
     status_list.append(status)
+    status_list =status_list[-2:]
 
     if status_list[-1] == 1 and status_list[-2] == 0:
         times.append(datetime.now())
     if status_list[-1] == 0 and status_list[-2] == 1:
         times.append(datetime.now())
+
 
     # adds text overlay of current status and time
     cv2.putText(frame, "Status: {}".format(text), (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
@@ -86,6 +88,6 @@ for i in range(0, len(times), 2):
 
 df.to_csv("Times.csv")
 
-video.release()
-#video.stop()
+#video.release()
+video.stop()
 cv2.destroyAllWindows()
