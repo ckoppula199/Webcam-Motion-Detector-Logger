@@ -9,8 +9,8 @@ status_list = [None, None] # list needs 2 initial items
 times = []
 df=pandas.DataFrame(columns=["Start", "End"])
 
-# # starts the camera, argument should  be changed if multiple cameras are available
-#video=cv2.VideoCapture(0)
+#starts the camera, argument should  be changed if multiple cameras are available
+#video=cv2.VideoCapture(0) # alternate way of accessing camera but I've found it not to be as good
 video = VideoStream(src=0).start()
 time.sleep(2.0) #gives camera time to adjust to envronmental conditions
 
@@ -18,7 +18,7 @@ while True:
 
 
     # captures boolean and numpy array from camera
-    #check, frame = video.read()
+    #check, frame = video.read() # if using cv2.VideoCapture(0) then uncomment this and comment the below statement
     frame = video.read()
     text = "No Movement Detected"
 
@@ -42,10 +42,10 @@ while True:
     thresh_frame=cv2.dilate(thresh_frame, None,iterations=2)
 
 
-    # finds conours of distinct objects in the frame
+    # finds contours of distinct objects in the frame
     (_,cnts,_)=cv2.findContours(thresh_frame.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    # if object has area greater than 1500 pxls then it is highlighted
+    # if object has area greater than 500 pxls then it is highlighted
     for contour in cnts:
         if cv2.contourArea(contour) < 500: # change value based on size of object trying to detect
             continue
@@ -55,12 +55,13 @@ while True:
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2) #draw rectangle
         text = "Motion Detected"
 
+    #saves space as we only need the last 2 values to check a change in status
     status_list.append(status)
-    status_list =status_list[-2:]
+    status_list = status_list[-2:]
 
-    if status_list[-1] == 1 and status_list[-2] == 0:
+    if status_list[-1] == 1 and status_list[-2] == 0: #object has been detected
         times.append(datetime.now())
-    if status_list[-1] == 0 and status_list[-2] == 1:
+    if status_list[-1] == 0 and status_list[-2] == 1: #object is no longer being detected
         times.append(datetime.now())
 
 
@@ -80,8 +81,6 @@ while True:
         if status == 1:
             times.append(datetime.now())
         break
-
-print(times)
 
 for i in range(0, len(times), 2):
     df = df.append({"Start": times[i], "End": times[i+1]}, ignore_index=True)
